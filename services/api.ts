@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import { parseCookies, setCookie } from 'nookies';
+import { signOut } from '../contexts/AuthContext';
 
 type FailedRequestsQueueProps = {
   onSuccess: (token: string) => void;
@@ -21,6 +22,7 @@ api.interceptors.response.use(response => {
   return response
 }, (error: AxiosError) => {
   if (error.response?.status === 401) {
+
     if (error.response.data?.code === 'token.expired') {
       // refresh token
       cookies = parseCookies();
@@ -71,7 +73,9 @@ api.interceptors.response.use(response => {
       })
 
     } else {
-      // user logout
+      signOut()
     }
   }
+
+  return Promise.reject(error);
 })
